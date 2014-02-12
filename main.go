@@ -25,13 +25,13 @@ func main() {
 		}
 		defer w.Close()
 	}
-	fmt.Fprintf(w, "package %s", *p)
+	fmt.Fprintf(w, "package %s\n", *p)
 	for _, fname := range flag.Args() {
 		b, err := ioutil.ReadFile(fname)
 		if err != nil {
 			log.Fatal(err)
 		}
 		v := strings.Join(fRE.FindAllString(fname, -1), "_")
-		fmt.Fprintf(w, "\n\nvar %s = []byte(%q)", v, b)
+		fmt.Fprintf(w, "\nvar %s = []byte(%q)\n", v, b)
 	}
 }
