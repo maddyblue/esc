@@ -57,10 +57,10 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				n := strings.TrimPrefix(filepath.ToSlash(fname), prefix)
-				local := path.Join(filepath.ToSlash(base), n)
+				fpath := filepath.ToSlash(fname)
+				n := strings.TrimPrefix(fpath, prefix)
 				n = path.Join("/", n)
-				content[n] = file{data: b, local: local}
+				content[n] = file{data: b, local: fpath}
 				fnames = append(fnames, n)
 			}
 			f.Close()
