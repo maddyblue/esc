@@ -4,8 +4,8 @@ esc embeds files into go programs and provides http.FileSystem interfaces
 to them.
 
 It adds all named files or files recursively under named directories at the
-path specified.
-
+path specified. The output file provides an http.FileSystem interface with
+zero dependencies on packages outside the standard library.
 
 Usage:
 	esc [-o outfile.go] [-pkg package] [-prefix prefix] [name ...]
