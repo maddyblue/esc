@@ -194,7 +194,7 @@ func (f *file) Sys() interface{} {
 	return f
 }
 
-// FS returns a http.Filesystem for the embedded assets. If local is true,
+// FS returns a http.Filesystem for the embedded assets. If useLocal is true,
 // the filesystem's contents are instead used.
 func FS(useLocal bool) http.FileSystem {
 	if useLocal {
