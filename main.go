@@ -85,7 +85,13 @@ func main() {
 		if err := gw.Close(); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Fprintf(w, "\n\t%q: {compressed: %q, size: %v, local: %q},\n", fname, buf.String(), len(f.data), f.local)
+		fmt.Fprintf(w, `
+	%q: {
+		local:      %q,
+		size:       %v,
+		compressed: %q,
+	},%s`, fname, f.local, len(f.data), buf.String(), "\n")
+	}
 	}
 	fmt.Fprint(w, footer)
 }
