@@ -149,11 +149,10 @@ func (_ staticFS) Open(name string) (http.File, error) {
 }
 
 func (f *file) File() (http.File, error) {
-	hf := httpFile{
+	return &httpFile{
 		Reader: bytes.NewReader(f.data),
 		file:   f,
-	}
-	return &hf, nil
+	}, nil
 }
 
 type httpFile struct {
