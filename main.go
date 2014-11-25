@@ -75,8 +75,12 @@ func main() {
 		defer w.Close()
 	}
 	fmt.Fprintf(w, header, *flagPkg)
+	dirs := map[string]bool{"/": true}
 	for _, fname := range fnames {
 		f := content[fname]
+		for b := path.Dir(fname); b != "/"; b = path.Dir(b) {
+			dirs[b] = true
+		}
 		var buf bytes.Buffer
 		gw := gzip.NewWriter(&buf)
 		if _, err := gw.Write(f.data); err != nil {
@@ -92,6 +96,11 @@ func main() {
 		compressed: %q,
 	},%s`, fname, f.local, len(f.data), buf.String(), "\n")
 	}
+	for dir := range dirs {
+		fmt.Fprintf(w, `
+	%q: {
+		isDir: true,
+	},%s`, dir, "\n")
 	}
 	fmt.Fprint(w, footer)
 }
@@ -122,6 +131,7 @@ type file struct {
 	compressed string
 	size       int64
 	local      string
+	isDir      bool
 
 	data []byte
 	once sync.Once
@@ -137,19 +147,22 @@ func (_ localFS) Open(name string) (http.File, error) {
 }
 
 func (_ staticFS) Open(name string) (http.File, error) {
-	f, present := data[name]
+	f, present := data[path.Clean(name)]
 	if !present {
 		return nil, os.ErrNotExist
 	}
 	var err error
 	f.once.Do(func() {
+		f.name = path.Base(name)
+		if f.size == 0 {
+			return
+		}
 		var gr *gzip.Reader
 		gr, err = gzip.NewReader(bytes.NewBufferString(f.compressed))
 		if err != nil {
 			return
 		}
 		f.data, err = ioutil.ReadAll(gr)
-		f.name = path.Base(name)
 	})
 	if err != nil {
 		return nil, err
@@ -196,9 +209,11 @@ func (f *file) Mode() os.FileMode {
 func (f *file) ModTime() time.Time {
 	return time.Time{}
 }
+
 func (f *file) IsDir() bool {
-	return false
+	return f.isDir
 }
+
 func (f *file) Sys() interface{} {
 	return f
 }
