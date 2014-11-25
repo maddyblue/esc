@@ -145,6 +145,9 @@ func (_ staticFS) Open(name string) (http.File, error) {
 		f.data, err = ioutil.ReadAll(gr)
 		f.name = path.Base(name)
 	})
+	if err != nil {
+		return nil, err
+	}
 	return f.File()
 }
 
