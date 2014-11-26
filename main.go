@@ -28,7 +28,7 @@ type file struct {
 func main() {
 	flag.Parse()
 	var err error
-	var fnames []string
+	var fnames, dirnames []string
 	content := make(map[string]file)
 	prefix := filepath.ToSlash(*flagPrefix)
 	for _, base := range flag.Args() {
@@ -96,7 +96,11 @@ func main() {
 		compressed: %q,
 	},%s`, fname, f.local, len(f.data), buf.String(), "\n")
 	}
-	for dir := range dirs {
+	for d := range dirs {
+		dirnames = append(dirnames, d)
+	}
+	sort.Strings(dirnames)
+	for _, dir := range dirnames {
 		fmt.Fprintf(w, `
 	%q: {
 		isDir: true,
