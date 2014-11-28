@@ -142,7 +142,7 @@ type file struct {
 	name string
 }
 
-func (_ localFS) Open(name string) (http.File, error) {
+func (fs localFS) Open(name string) (http.File, error) {
 	f, present := data[name]
 	if !present {
 		return nil, os.ErrNotExist
@@ -150,7 +150,7 @@ func (_ localFS) Open(name string) (http.File, error) {
 	return os.Open(f.local)
 }
 
-func (_ staticFS) Open(name string) (http.File, error) {
+func (fs staticFS) Open(name string) (http.File, error) {
 	f, present := data[path.Clean(name)]
 	if !present {
 		return nil, os.ErrNotExist
