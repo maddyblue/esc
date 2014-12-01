@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 var (
@@ -21,8 +22,9 @@ var (
 )
 
 type file struct {
-	data  []byte
-	local string
+	data    []byte
+	local   string
+	modtime time.Time
 }
 
 func main() {
@@ -60,7 +62,7 @@ func main() {
 				fpath := filepath.ToSlash(fname)
 				n := strings.TrimPrefix(fpath, prefix)
 				n = path.Join("/", n)
-				content[n] = file{data: b, local: fpath}
+				content[n] = file{data: b, local: fpath, modtime: fi.ModTime()}
 				fnames = append(fnames, n)
 			}
 			f.Close()
@@ -94,7 +96,8 @@ func main() {
 		local:      %q,
 		size:       %v,
 		compressed: %q,
-	},%s`, fname, f.local, len(f.data), buf.String(), "\n")
+		modtime:    time.Date(%v,time.%v,%v,%v,%v,%v,%v,time.%v),
+	},%s`, fname, f.local, len(f.data), buf.String(), f.modtime.Year(), f.modtime.Month(), f.modtime.Day(), f.modtime.Hour(), f.modtime.Second(), f.modtime.Second(), f.modtime.Nanosecond(), f.modtime.Location(), "\n")
 	}
 	for d := range dirs {
 		dirnames = append(dirnames, d)
@@ -136,6 +139,7 @@ type file struct {
 	size       int64
 	local      string
 	isDir      bool
+	modtime    time.Time
 
 	data []byte
 	once sync.Once
@@ -211,7 +215,7 @@ func (f *file) Mode() os.FileMode {
 }
 
 func (f *file) ModTime() time.Time {
-	return time.Time{}
+	return f.modtime
 }
 
 func (f *file) IsDir() bool {
