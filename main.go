@@ -91,10 +91,10 @@ func main() {
 		}
 		fmt.Fprintf(w, `
 	%q: {
-		local:      %q,
-		size:       %v,
-		compressed: %q,
-	},%s`, fname, f.local, len(f.data), buf.String(), "\n")
+		local: %q,
+		size:  %v,
+		compressed: %s,
+	},%s`, fname, f.local, len(f.data), segment(&buf), "\n")
 	}
 	for d := range dirs {
 		dirnames = append(dirnames, d)
@@ -107,6 +107,24 @@ func main() {
 	},%s`, dir, "\n")
 	}
 	fmt.Fprint(w, footer)
+}
+
+func segment(s *bytes.Buffer) string {
+	b := new(bytes.Buffer)
+	first := true
+	for s.Len() > 0 {
+		v := string(s.Next(100))
+		if !first {
+			b.WriteString("\t\t\t")
+		} else {
+			first = false
+		}
+		b.WriteString(fmt.Sprintf("%q", v))
+		if s.Len() > 0 {
+			b.WriteString(" +\n")
+		}
+	}
+	return b.String()
 }
 
 const (
