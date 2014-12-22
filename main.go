@@ -20,7 +20,7 @@ var (
 	flagPrefix = flag.String("prefix", "", "Prefix to strip from filesnames.")
 )
 
-type file struct {
+type _esc_file struct {
 	data  []byte
 	local string
 }
@@ -29,7 +29,7 @@ func main() {
 	flag.Parse()
 	var err error
 	var fnames, dirnames []string
-	content := make(map[string]file)
+	content := make(map[string]_esc_file)
 	prefix := filepath.ToSlash(*flagPrefix)
 	for _, base := range flag.Args() {
 		files := []string{base}
@@ -60,7 +60,7 @@ func main() {
 				fpath := filepath.ToSlash(fname)
 				n := strings.TrimPrefix(fpath, prefix)
 				n = path.Join("/", n)
-				content[n] = file{data: b, local: fpath}
+				content[n] = _esc_file{data: b, local: fpath}
 				fnames = append(fnames, n)
 			}
 			f.Close()
@@ -141,15 +141,15 @@ import (
 	"time"
 )
 
-type localFS struct{}
+type _esc_localFS struct{}
 
-var local localFS
+var _esc_local _esc_localFS
 
-type staticFS struct{}
+type _esc_staticFS struct{}
 
-var static staticFS
+var _esc_static _esc_staticFS
 
-type file struct {
+type _esc_file struct {
 	compressed string
 	size       int64
 	local      string
@@ -160,16 +160,16 @@ type file struct {
 	name string
 }
 
-func (fs localFS) Open(name string) (http.File, error) {
-	f, present := data[name]
+func (_esc_localFS) Open(name string) (http.File, error) {
+	f, present := _esc_data[name]
 	if !present {
 		return nil, os.ErrNotExist
 	}
 	return os.Open(f.local)
 }
 
-func (fs staticFS) Open(name string) (http.File, error) {
-	f, present := data[path.Clean(name)]
+func (_esc_staticFS) Open(name string) (http.File, error) {
+	f, present := _esc_data[path.Clean(name)]
 	if !present {
 		return nil, os.ErrNotExist
 	}
@@ -192,51 +192,50 @@ func (fs staticFS) Open(name string) (http.File, error) {
 	return f.File()
 }
 
-func (f *file) File() (http.File, error) {
+func (f *_esc_file) File() (http.File, error) {
+	type httpFile struct {
+		*bytes.Reader
+		*_esc_file
+	}
 	return &httpFile{
-		Reader: bytes.NewReader(f.data),
-		file:   f,
+		Reader:    bytes.NewReader(f.data),
+		_esc_file: f,
 	}, nil
 }
 
-type httpFile struct {
-	*bytes.Reader
-	*file
-}
-
-func (f *file) Close() error {
+func (f *_esc_file) Close() error {
 	return nil
 }
 
-func (f *file) Readdir(count int) ([]os.FileInfo, error) {
+func (f *_esc_file) Readdir(count int) ([]os.FileInfo, error) {
 	return nil, nil
 }
 
-func (f *file) Stat() (os.FileInfo, error) {
+func (f *_esc_file) Stat() (os.FileInfo, error) {
 	return f, nil
 }
 
-func (f *file) Name() string {
+func (f *_esc_file) Name() string {
 	return f.name
 }
 
-func (f *file) Size() int64 {
+func (f *_esc_file) Size() int64 {
 	return f.size
 }
 
-func (f *file) Mode() os.FileMode {
+func (f *_esc_file) Mode() os.FileMode {
 	return 0
 }
 
-func (f *file) ModTime() time.Time {
+func (f *_esc_file) ModTime() time.Time {
 	return time.Time{}
 }
 
-func (f *file) IsDir() bool {
+func (f *_esc_file) IsDir() bool {
 	return f.isDir
 }
 
-func (f *file) Sys() interface{} {
+func (f *_esc_file) Sys() interface{} {
 	return f
 }
 
@@ -244,12 +243,12 @@ func (f *file) Sys() interface{} {
 // the filesystem's contents are instead used.
 func FS(useLocal bool) http.FileSystem {
 	if useLocal {
-		return local
+		return _esc_local
 	}
-	return static
+	return _esc_static
 }
 
-var data = map[string]*file{
+var _esc_data = map[string]*_esc_file{
 `
 	footer = `}
 `
