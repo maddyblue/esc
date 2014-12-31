@@ -101,10 +101,15 @@ func main() {
 	}
 	sort.Strings(dirnames)
 	for _, dir := range dirnames {
+		local := path.Join(prefix, dir)
+		if len(local) == 0 {
+			local = "."
+		}
 		fmt.Fprintf(w, `
 	%q: {
 		isDir: true,
-	},%s`, dir, "\n")
+		local: %q,
+	},%s`, dir, local, "\n")
 	}
 	fmt.Fprint(w, footer)
 }
@@ -161,7 +166,7 @@ type _esc_file struct {
 }
 
 func (_esc_localFS) Open(name string) (http.File, error) {
-	f, present := _esc_data[name]
+	f, present := _esc_data[path.Clean(name)]
 	if !present {
 		return nil, os.ErrNotExist
 	}
