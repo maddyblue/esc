@@ -115,16 +115,10 @@ func main() {
 }
 
 func segment(s *bytes.Buffer) string {
-	b := new(bytes.Buffer)
-	first := true
+	b := bytes.NewBufferString("\"\" +\n")
 	for s.Len() > 0 {
 		v := string(s.Next(100))
-		if !first {
-			b.WriteString("\t\t\t")
-		} else {
-			first = false
-		}
-		b.WriteString(fmt.Sprintf("%q", v))
+		b.WriteString(fmt.Sprintf("\t\t\t%q", v))
 		if s.Len() > 0 {
 			b.WriteString(" +\n")
 		}
