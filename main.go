@@ -273,11 +273,7 @@ func FSString(useLocal bool, path string) (string, error) {
 
 // FSMustString is same as FSString but panics on error.
 func FSMustString(useLocal bool, path string) string {
-	if s, err := FSString(useLocal, path); err != nil {
-		panic(err)
-	} else {
-		return s
-	}
+	return string(FSMustByte(useLocal, path))
 }
 
 var _esc_data = map[string]*_esc_file{
