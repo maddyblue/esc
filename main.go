@@ -247,6 +247,39 @@ func FS(useLocal bool) http.FileSystem {
 	return _esc_static
 }
 
+// FSByte returns the content of an embedded asset as a byte slice.
+func FSByte(useLocal bool, path string) ([]byte, error) {
+	r, err := FS(useLocal).Open(path)
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(r)
+}
+
+// FSMustByte is same as FSByte but panics on error.
+func FSMustByte(useLocal bool, path string) []byte {
+	if b, err := FSByte(useLocal, path); err != nil {
+		panic(err)
+	} else {
+		return b
+	}
+}
+
+// FSString returns the content of an embeded asset as a string.
+func FSString(useLocal bool, path string) (string, error) {
+	b, e := FSByte(useLocal, path)
+	return string(b), e
+}
+
+// FSMustString is same as FSString but panics on error.
+func FSMustString(useLocal bool, path string) string {
+	if s, err := FSString(useLocal, path); err != nil {
+		panic(err)
+	} else {
+		return s
+	}
+}
+
 var _esc_data = map[string]*_esc_file{
 `
 	footer = `}
