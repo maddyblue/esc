@@ -256,7 +256,7 @@ func FSByte(useLocal bool, path string) ([]byte, error) {
 	return ioutil.ReadAll(r)
 }
 
-// FSMustByte is same as FSByte but panics on error.
+// FSMustByte is the same as FSByte but panics on error.
 func FSMustByte(useLocal bool, path string) []byte {
 	if b, err := FSByte(useLocal, path); err != nil {
 		panic(err)
@@ -271,7 +271,7 @@ func FSString(useLocal bool, path string) (string, error) {
 	return string(b), e
 }
 
-// FSMustString is same as FSString but panics on error.
+// FSMustString is the same as FSString but panics on error.
 func FSMustString(useLocal bool, path string) string {
 	return string(FSMustByte(useLocal, path))
 }

@@ -24,7 +24,7 @@ After producing an output file, the assets may be accessed with the FS()
 function, which takes a flag to use local assets instead (for local
 development).
 
-FS(Must)?(Byte|String) return an asset as a (byte slice|string).
+FS(Must)?(Byte|String) returns an asset as a (byte slice|string).
 FSMust(Byte|String) panics if the asset is not found.
 
 */
