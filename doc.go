@@ -24,10 +24,10 @@ After producing an output file, the assets may be accessed with the FS()
 function, which takes a flag to use local assets instead (for local
 development).
 
-HTTP Example
+Example
 
 Embedded assets can be served with HTTP using the http.FileServer. Assuming you have a directory called "static" and
-have run "esc static > static.go" and main.go has the following code:
+have run "esc -o static.go static" and main.go has the following code:
 
     package main
 
@@ -39,11 +39,7 @@ have run "esc static > static.go" and main.go has the following code:
     func main() {
         //FS() is created by esc and returns a http.Filesystem compatible with http.FileServer
         http.Handle("/static/", http.FileServer(FS(false)))
-
-        //Start the server
-        if err := http.ListenAndServe(":8080", nil); err != nil {
-            log.Fatal("HTTP Server failed: ", err)
-        }
+        log.Fatal(http.ListenAndServe(":8080", nil))
     }
 
 
