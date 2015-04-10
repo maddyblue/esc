@@ -8,15 +8,15 @@ path specified. The output file provides an http.FileSystem interface with
 zero dependencies on packages outside the standard library.
 
 Usage:
-    esc [-o outfile.go] [-pkg package] [-prefix prefix] [name ...]
+	esc [-o outfile.go] [-pkg package] [-prefix prefix] [name ...]
 
 The flags are:
-    -o=""
-        output filename, defaults to stdout
-    -pkg="main"
-        package name of output file, defaults to main
-    -prefix=""
-        strip given prefix from filenames
+	-o=""
+		output filename, defaults to stdout
+	-pkg="main"
+		package name of output file, defaults to main
+	-prefix=""
+		strip given prefix from filenames
 
 Accessing Embedded Files
 
@@ -26,25 +26,31 @@ development).
 
 Example
 
-Embedded assets can be served with HTTP using the http.FileServer. Assuming you have a directory called "static" and
-have run "esc -o static.go static" and main.go has the following code:
+Embedded assets can be served with HTTP using the http.FileServer. Assuming you have a directory 
+structure similar to the following:
 
-    package main
+	/..
+	/main.go
+	/static/index.html
+	/static/css/style.css
 
-    import (
-        "log"
-        "net/http"
-    )
+Where main.go contains:
 
-    func main() {
-        //FS() is created by esc and returns a http.Filesystem compatible with http.FileServer
-        http.Handle("/static/", http.FileServer(FS(false)))
-        log.Fatal(http.ListenAndServe(":8080", nil))
-    }
+	package main
 
+	import (
+		"log"
+		"net/http"
+	)
+	
+	func main() {
+		//FS() is created by esc and returns a http.Filesystem compatible with http.FileServer
+		http.Handle("/static/", http.FileServer(FS(false)))
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}
 
-You can now execute "go run main.go static.go" and access the embedded files in a
-browser via http://localhost:8080/static/
-
+1. Execute esc -o static.go static to generate the embedded data
+2. go run main.go and static.go to start the server
+3. access http://localhost:8080/static/ to view the files
 */
 package main
