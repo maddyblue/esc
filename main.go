@@ -257,7 +257,7 @@ func FS(useLocal bool) http.FileSystem {
 
 func FSByte(useLocal bool, name string) ([]byte, error) {
 	if useLocal {
-		f, err := FS(true).Open(name)
+		f, err := _esc_local.Open(name)
 		if err != nil {
 			return nil, err
 		}
