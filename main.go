@@ -167,7 +167,7 @@ func (_esc_localFS) Open(name string) (http.File, error) {
 	return os.Open(f.local)
 }
 
-func (_esc_staticFS) Open(name string) (http.File, error) {
+func (_esc_staticFS) prepare(name string) (*_esc_file, error) {
 	f, present := _esc_data[path.Clean(name)]
 	if !present {
 		return nil, os.ErrNotExist
@@ -185,6 +185,14 @@ func (_esc_staticFS) Open(name string) (http.File, error) {
 		}
 		f.data, err = ioutil.ReadAll(gr)
 	})
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func (fs _esc_staticFS) Open(name string) (http.File, error) {
+	f, err := fs.prepare(name)
 	if err != nil {
 		return nil, err
 	}
@@ -245,6 +253,38 @@ func FS(useLocal bool) http.FileSystem {
 		return _esc_local
 	}
 	return _esc_static
+}
+
+func FSByte(useLocal bool, name string) ([]byte, error) {
+	if useLocal {
+		f, err := _esc_local.Open(name)
+		if err != nil {
+			return nil, err
+		}
+		return ioutil.ReadAll(f)
+	}
+	f, err := _esc_static.prepare(name)
+	if err != nil {
+		return nil, err
+	}
+	return f.data, nil
+}
+
+func FSMustByte(useLocal bool, name string) []byte {
+	b, err := FSByte(useLocal, name)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
+func FSString(useLocal bool, name string) (string, error) {
+	b, err := FSByte(useLocal, name)
+	return string(b), err
+}
+
+func FSMustString(useLocal bool, name string) string {
+	return string(FSMustByte(useLocal, name))
 }
 
 var _esc_data = map[string]*_esc_file{

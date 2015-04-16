@@ -24,6 +24,9 @@ After producing an output file, the assets may be accessed with the FS()
 function, which takes a flag to use local assets instead (for local
 development).
 
+FS(Must)?(Byte|String) returns an asset as a (byte slice|string).
+FSMust(Byte|String) panics if the asset is not found.
+
 Example
 
 Embedded assets can be served with HTTP using the http.FileServer. Assuming you have a directory 
@@ -52,5 +55,6 @@ Where main.go contains:
 1. Execute esc -o static.go static to generate the embedded data
 2. go run main.go and static.go to start the server
 3. access http://localhost:8080/static/ to view the files
+
 */
 package main
