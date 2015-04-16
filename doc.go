@@ -29,8 +29,8 @@ FSMust(Byte|String) panics if the asset is not found.
 
 Example
 
-Embedded assets can be served with HTTP using the http.FileServer. Assuming you have a directory 
-structure similar to the following:
+Embedded assets can be served with HTTP using the http.FileServer.
+Assuming you have a directory structure similar to the following:
 
 	/..
 	/main.go
@@ -45,16 +45,18 @@ Where main.go contains:
 		"log"
 		"net/http"
 	)
-	
+
 	func main() {
-		//FS() is created by esc and returns a http.Filesystem compatible with http.FileServer
+		// FS() is created by esc and returns a http.Filesystem compatible with http.FileServer.
 		http.Handle("/static/", http.FileServer(FS(false)))
 		log.Fatal(http.ListenAndServe(":8080", nil))
 	}
 
-1. Execute esc -o static.go static to generate the embedded data
-2. go run main.go and static.go to start the server
-3. access http://localhost:8080/static/ to view the files
+1. Generate the embedded data:
+	esc -o static.go static
+2. Start the server:
+	go run main.go static.go
+3. Access http://localhost:8080/static/index.html to view the files.
 
 */
 package main

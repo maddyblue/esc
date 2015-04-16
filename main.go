@@ -255,6 +255,9 @@ func FS(useLocal bool) http.FileSystem {
 	return _esc_static
 }
 
+
+// FSByte returns the named file from the embedded assets. If useLocal is
+// true, the filesystem's contents are instead used.
 func FSByte(useLocal bool, name string) ([]byte, error) {
 	if useLocal {
 		f, err := _esc_local.Open(name)
@@ -270,6 +273,7 @@ func FSByte(useLocal bool, name string) ([]byte, error) {
 	return f.data, nil
 }
 
+// FSMustByte is the same as FSByte, but panics if name is not present.
 func FSMustByte(useLocal bool, name string) []byte {
 	b, err := FSByte(useLocal, name)
 	if err != nil {
@@ -278,11 +282,13 @@ func FSMustByte(useLocal bool, name string) []byte {
 	return b
 }
 
+// FSString is the string version of FSByte.
 func FSString(useLocal bool, name string) (string, error) {
 	b, err := FSByte(useLocal, name)
 	return string(b), err
 }
 
+// FSMustString is the string version of FSMustByte.
 func FSMustString(useLocal bool, name string) string {
 	return string(FSMustByte(useLocal, name))
 }
