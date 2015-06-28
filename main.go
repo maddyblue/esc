@@ -226,7 +226,7 @@ func (fs _escStaticFS) Open(name string) (http.File, error) {
 }
 
 func (dir _escDir) Open(name string) (http.File, error) {
-	return dir.fs.Open(dir.name + "/" + name)
+	return dir.fs.Open(dir.name + name)
 }
 
 func (f *_escFile) File() (http.File, error) {
