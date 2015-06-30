@@ -37,14 +37,17 @@ func main() {
 	prefix := filepath.ToSlash(*flagPrefix)
 	var ignoreRegexp *regexp.Regexp
 	if *flagIgnore != "" {
-		ignoreRegexp = regexp.MustCompile(*flagIgnore)
+		ignoreRegexp, err = regexp.Compile(*flagIgnore)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	for _, base := range flag.Args() {
 		files := []string{base}
 		for len(files) > 0 {
 			fname := files[0]
 			files = files[1:]
-			if *flagIgnore != "" && ignoreRegexp.FindString(fname) != "" {
+			if ignoreRegexp != nil && ignoreRegexp.MatchString(fname) {
 				continue
 			}
 			f, err := os.Open(fname)
