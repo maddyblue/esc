@@ -17,11 +17,10 @@ import (
 )
 
 var (
-	flagOut      = flag.String("o", "", "Output file, else stdout.")
-	flagPkg      = flag.String("pkg", "main", "Package.")
-	flagPrefix   = flag.String("prefix", "", "Prefix to strip from filesnames.")
-	flagCondense = flag.Bool("condense", false, "Should we condense the compressed data in the generated source.")
-	flagIgnore   = flag.String("ignore", "", "Regexp for files we should ignore (for example \\\\.DS_Store).")
+	flagOut    = flag.String("o", "", "Output file, else stdout.")
+	flagPkg    = flag.String("pkg", "main", "Package.")
+	flagPrefix = flag.String("prefix", "", "Prefix to strip from filesnames.")
+	flagIgnore = flag.String("ignore", "", "Regexp for files we should ignore (for example \\\\.DS_Store).")
 )
 
 type _escFile struct {
@@ -88,11 +87,7 @@ func main() {
 		}
 		defer w.Close()
 	}
-	if *flagCondense {
-		fmt.Fprintf(w, header, *flagPkg, "\n\t\"encoding/base64\"", "b64 := base64.NewDecoder(base64.URLEncoding, bytes.NewBufferString(f.compressed))\n\t\tgr, err = gzip.NewReader(b64)")
-	} else {
-		fmt.Fprintf(w, header, *flagPkg, "", "gr, err = gzip.NewReader(bytes.NewBufferString(f.compressed))")
-	}
+	fmt.Fprintf(w, header, *flagPkg)
 	dirs := map[string]bool{"/": true}
 	for _, fname := range fnames {
 		f := content[fname]
@@ -133,21 +128,10 @@ func main() {
 }
 
 func segment(s *bytes.Buffer) string {
-	if *flagCondense {
-		var b bytes.Buffer
-		b64 := base64.NewEncoder(base64.URLEncoding, &b)
-		b64.Write(s.Bytes())
-		return "\"" + b.String() + "\""
-	}
-	b := bytes.NewBufferString("\"\" +\n")
-	for s.Len() > 0 {
-		v := string(s.Next(100))
-		b.WriteString(fmt.Sprintf("\t\t\t%q", v))
-		if s.Len() > 0 {
-			b.WriteString(" +\n")
-		}
-	}
-	return b.String()
+	var b bytes.Buffer
+	b64 := base64.NewEncoder(base64.URLEncoding, &b)
+	b64.Write(s.Bytes())
+	return "\"" + b.String() + "\""
 }
 
 const (
@@ -155,7 +139,8 @@ const (
 
 import (
 	"bytes"
-	"compress/gzip"%s
+	"compress/gzip"
+	"encoding/base64"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -208,7 +193,8 @@ func (_escStaticFS) prepare(name string) (*_escFile, error) {
 			return
 		}
 		var gr *gzip.Reader
-		%s
+		b64 := base64.NewDecoder(base64.URLEncoding, bytes.NewBufferString(f.compressed))
+		gr, err = gzip.NewReader(b64)
 		if err != nil {
 			return
 		}
