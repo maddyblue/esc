@@ -129,9 +129,15 @@ func main() {
 
 func segment(s *bytes.Buffer) string {
 	var b bytes.Buffer
-	b64 := base64.NewEncoder(base64.URLEncoding, &b)
+	b64 := base64.NewEncoder(base64.StdEncoding, &b)
 	b64.Write(s.Bytes())
-	return "\"" + b.String() + "\""
+	b64.Close()
+	res := "`\n"
+	chunk := make([]byte, 76)
+	for n, _ := b.Read(chunk); n > 0; n, _ = b.Read(chunk) {
+		res += string(chunk[0:n]) + "\n"
+	}
+	return res + "`"
 }
 
 const (
@@ -193,7 +199,7 @@ func (_escStaticFS) prepare(name string) (*_escFile, error) {
 			return
 		}
 		var gr *gzip.Reader
-		b64 := base64.NewDecoder(base64.URLEncoding, bytes.NewBufferString(f.compressed))
+		b64 := base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(f.compressed))
 		gr, err = gzip.NewReader(b64)
 		if err != nil {
 			return
