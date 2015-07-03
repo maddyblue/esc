@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -18,6 +20,7 @@ var (
 	flagOut    = flag.String("o", "", "Output file, else stdout.")
 	flagPkg    = flag.String("pkg", "main", "Package.")
 	flagPrefix = flag.String("prefix", "", "Prefix to strip from filesnames.")
+	flagIgnore = flag.String("ignore", "", "Regexp for files we should ignore (for example \\\\.DS_Store).")
 )
 
 type _escFile struct {
@@ -31,11 +34,21 @@ func main() {
 	var fnames, dirnames []string
 	content := make(map[string]_escFile)
 	prefix := filepath.ToSlash(*flagPrefix)
+	var ignoreRegexp *regexp.Regexp
+	if *flagIgnore != "" {
+		ignoreRegexp, err = regexp.Compile(*flagIgnore)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	for _, base := range flag.Args() {
 		files := []string{base}
 		for len(files) > 0 {
 			fname := files[0]
 			files = files[1:]
+			if ignoreRegexp != nil && ignoreRegexp.MatchString(fname) {
+				continue
+			}
 			f, err := os.Open(fname)
 			if err != nil {
 				log.Fatal(err)
@@ -115,15 +128,16 @@ func main() {
 }
 
 func segment(s *bytes.Buffer) string {
-	b := bytes.NewBufferString("\"\" +\n")
-	for s.Len() > 0 {
-		v := string(s.Next(100))
-		b.WriteString(fmt.Sprintf("\t\t\t%q", v))
-		if s.Len() > 0 {
-			b.WriteString(" +\n")
-		}
+	var b bytes.Buffer
+	b64 := base64.NewEncoder(base64.StdEncoding, &b)
+	b64.Write(s.Bytes())
+	b64.Close()
+	res := "`\n"
+	chunk := make([]byte, 76)
+	for n, _ := b.Read(chunk); n > 0; n, _ = b.Read(chunk) {
+		res += string(chunk[0:n]) + "\n"
 	}
-	return b.String()
+	return res + "`"
 }
 
 const (
@@ -132,6 +146,7 @@ const (
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/base64"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -147,6 +162,11 @@ var _escLocal _escLocalFS
 type _escStaticFS struct{}
 
 var _escStatic _escStaticFS
+
+type _escDir struct {
+	fs   http.FileSystem
+	name string
+}
 
 type _escFile struct {
 	compressed string
@@ -179,7 +199,8 @@ func (_escStaticFS) prepare(name string) (*_escFile, error) {
 			return
 		}
 		var gr *gzip.Reader
-		gr, err = gzip.NewReader(bytes.NewBufferString(f.compressed))
+		b64 := base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(f.compressed))
+		gr, err = gzip.NewReader(b64)
 		if err != nil {
 			return
 		}
@@ -197,6 +218,10 @@ func (fs _escStaticFS) Open(name string) (http.File, error) {
 		return nil, err
 	}
 	return f.File()
+}
+
+func (dir _escDir) Open(name string) (http.File, error) {
+	return dir.fs.Open(dir.name + name)
 }
 
 func (f *_escFile) File() (http.File, error) {
@@ -253,6 +278,15 @@ func FS(useLocal bool) http.FileSystem {
 		return _escLocal
 	}
 	return _escStatic
+}
+
+// Dir returns a http.Filesystem for the embedded assets on a given prefix dir.
+// If useLocal is true, the filesystem's contents are instead used.
+func Dir(useLocal bool, name string) http.FileSystem {
+	if useLocal {
+		return _escDir{fs: _escLocal, name: name}
+	}
+	return _escDir{fs: _escStatic, name: name}
 }
 
 // FSByte returns the named file from the embedded assets. If useLocal is
