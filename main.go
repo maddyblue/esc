@@ -164,7 +164,7 @@ type _escStaticFS struct{}
 var _escStatic _escStaticFS
 
 type _escDir struct {
-	fs http.FileSystem
+	fs   http.FileSystem
 	name string
 }
 
@@ -286,7 +286,7 @@ func Dir(useLocal bool, name string) http.FileSystem {
 	if useLocal {
 		return _escDir{fs: _escLocal, name: name}
 	}
-	return _escDir{fs: _escStatic, name:name}
+	return _escDir{fs: _escStatic, name: name}
 }
 
 // FSByte returns the named file from the embedded assets. If useLocal is
