@@ -24,8 +24,9 @@ var (
 )
 
 type _escFile struct {
-	data  []byte
-	local string
+	data     []byte
+	local    string
+	fileinfo os.FileInfo
 }
 
 func main() {
@@ -73,7 +74,7 @@ func main() {
 				fpath := filepath.ToSlash(fname)
 				n := strings.TrimPrefix(fpath, prefix)
 				n = path.Join("/", n)
-				content[n] = _escFile{data: b, local: fpath}
+				content[n] = _escFile{data: b, local: fpath, fileinfo: fi}
 				fnames = append(fnames, n)
 			}
 			f.Close()
@@ -104,10 +105,9 @@ func main() {
 		}
 		fmt.Fprintf(w, `
 	%q: {
-		local: %q,
-		size:  %v,
+		local: %q, size: %v, modtime: %v,
 		compressed: %s,
-	},%s`, fname, f.local, len(f.data), segment(&buf), "\n")
+	},%s`, fname, f.local, len(f.data), f.fileinfo.ModTime().Unix(), segment(&buf), "\n")
 	}
 	for d := range dirs {
 		dirnames = append(dirnames, d)
@@ -171,6 +171,7 @@ type _escDir struct {
 type _escFile struct {
 	compressed string
 	size       int64
+	modtime    int64
 	local      string
 	isDir      bool
 
@@ -260,7 +261,7 @@ func (f *_escFile) Mode() os.FileMode {
 }
 
 func (f *_escFile) ModTime() time.Time {
-	return time.Time{}
+	return time.Unix(f.modtime, 0)
 }
 
 func (f *_escFile) IsDir() bool {
