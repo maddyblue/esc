@@ -13,14 +13,17 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
 var (
-	flagOut    = flag.String("o", "", "Output file, else stdout.")
-	flagPkg    = flag.String("pkg", "main", "Package.")
-	flagPrefix = flag.String("prefix", "", "Prefix to strip from filesnames.")
-	flagIgnore = flag.String("ignore", "", "Regexp for files we should ignore (for example \\\\.DS_Store).")
+	flagOut     = flag.String("o", "", "Output file, else stdout.")
+	flagPkg     = flag.String("pkg", "main", "Package.")
+	flagPrefix  = flag.String("prefix", "", "Prefix to strip from filesnames.")
+	flagIgnore  = flag.String("ignore", "", "Regexp for files we should ignore (for example \\\\.DS_Store).")
+	flagModTime = flag.String("modtime", "", "Unix timestamp to override as modification time for all files.")
+	modTime     *int64
 )
 
 type _escFile struct {
@@ -32,6 +35,13 @@ type _escFile struct {
 func main() {
 	flag.Parse()
 	var err error
+	if *flagModTime != "" {
+		i, err := strconv.ParseInt(*flagModTime, 10, 64)
+		if err != nil {
+			log.Fatalf("mod time must be an integer: %v", err)
+		}
+		modTime = &i
+	}
 	var fnames, dirnames []string
 	content := make(map[string]_escFile)
 	prefix := filepath.ToSlash(*flagPrefix)
@@ -103,11 +113,17 @@ func main() {
 		if err := gw.Close(); err != nil {
 			log.Fatal(err)
 		}
+		t := f.fileinfo.ModTime().Unix()
+		if modTime != nil {
+			t = *modTime
+		}
 		fmt.Fprintf(w, `
 	%q: {
-		local: %q, size: %v, modtime: %v,
+		local:   %q,
+		size:    %v,
+		modtime: %v,
 		compressed: %s,
-	},%s`, fname, f.local, len(f.data), f.fileinfo.ModTime().Unix(), segment(&buf), "\n")
+	},%s`, fname, f.local, len(f.data), t, segment(&buf), "\n")
 	}
 	for d := range dirs {
 		dirnames = append(dirnames, d)
