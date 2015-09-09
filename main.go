@@ -38,7 +38,7 @@ func main() {
 	if *flagModTime != "" {
 		i, err := strconv.ParseInt(*flagModTime, 10, 64)
 		if err != nil {
-			log.Fatalf("mod time must be an integer: %v", err)
+			log.Fatalf("modtime must be an integer: %v", err)
 		}
 		modTime = &i
 	}
