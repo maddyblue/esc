@@ -8,7 +8,7 @@ path specified. The output file provides an http.FileSystem interface with
 zero dependencies on packages outside the standard library.
 
 Usage:
-	esc [-o outfile.go] [-pkg package] [-prefix prefix] [name ...]
+	esc [flag] [name ...]
 
 The flags are:
 	-o=""
@@ -17,6 +17,10 @@ The flags are:
 		package name of output file, defaults to main
 	-prefix=""
 		strip given prefix from filenames
+	-ignore=""
+		regular expression for files to ignore
+	-modtime=""
+		Unix timestamp to override as modification time for all files
 
 Accessing Embedded Files
 
