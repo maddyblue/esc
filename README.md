@@ -1,5 +1,7 @@
 # esc
 
+[![GoDoc](https://godoc.org/github.com/mjibson/esc?status.svg)](https://godoc.org/github.com/mjibson/esc)
+
 esc embeds files into go programs and provides http.FileSystem interfaces
 to them.
 
