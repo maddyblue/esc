@@ -31,6 +31,12 @@ development).
 FS(Must)?(Byte|String) returns an asset as a (byte slice|string).
 FSMust(Byte|String) panics if the asset is not found.
 
+Go Generate
+
+esc can be invoked by go generate:
+
+	//go:generate esc -o static.go -pkg server static
+
 Example
 
 Embedded assets can be served with HTTP using the http.FileServer.
