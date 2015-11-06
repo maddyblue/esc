@@ -53,7 +53,7 @@ Where main.go contains:
 	)
 
 	func main() {
-		// FS() is created by esc and returns a http.Filesystem compatible with http.FileServer.
+		// FS() is created by esc and returns a http.Filesystem.
 		http.Handle("/static/", http.FileServer(FS(false)))
 		log.Fatal(http.ListenAndServe(":8080", nil))
 	}
