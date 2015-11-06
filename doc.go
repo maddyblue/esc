@@ -36,10 +36,12 @@ Example
 Embedded assets can be served with HTTP using the http.FileServer.
 Assuming you have a directory structure similar to the following:
 
-	/..
-	/main.go
-	/static/index.html
-	/static/css/style.css
+	.
+	├── main.go
+	└── static
+	    ├── css
+	    │   └── style.css
+	    └── index.html
 
 Where main.go contains:
 
