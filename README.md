@@ -26,6 +26,8 @@ The flags are:
 	regular expression for files to ignore
 -modtime=""
 	Unix timestamp to override as modification time for all files
+-private
+	Use non-exported function names. Standard FS* functions will be prefixed with esc.  Eg: FSString => escFSString.
 ```
 
 ## Accessing Embedded Files
