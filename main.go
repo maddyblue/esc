@@ -30,17 +30,6 @@ var (
 
 type headerTemplateParams struct {
 	PackageName              string
-	OpenFunctionName         string
-	FileFunctionName         string
-	CloseFunctionName        string
-	ReaddirFunctionName      string
-	StatFunctionName         string
-	NameFunctionName         string
-	SizeFunctionName         string
-	ModeFunctionName         string
-	ModTimeFunctionName      string
-	IsDirFunctionName        string
-	SysFunctionName          string
 	FSFunctionName           string
 	DirFunctionName          string
 	FSByteFunctionName       string
@@ -194,17 +183,6 @@ func templateFunctionName(basename string, isPublic bool) string {
 func header(packageName string, enableExports bool) (string, error) {
 	headerParams := headerTemplateParams{
 		PackageName:              packageName,
-		OpenFunctionName:         templateFunctionName("Open", enableExports),
-		FileFunctionName:         templateFunctionName("File", enableExports),
-		CloseFunctionName:        templateFunctionName("Close", enableExports),
-		ReaddirFunctionName:      templateFunctionName("Readdir", enableExports),
-		StatFunctionName:         templateFunctionName("Stat", enableExports),
-		NameFunctionName:         templateFunctionName("Name", enableExports),
-		SizeFunctionName:         templateFunctionName("Size", enableExports),
-		ModeFunctionName:         templateFunctionName("Mode", enableExports),
-		ModTimeFunctionName:      templateFunctionName("ModTime", enableExports),
-		IsDirFunctionName:        templateFunctionName("IsDir", enableExports),
-		SysFunctionName:          templateFunctionName("Sys", enableExports),
 		FSFunctionName:           templateFunctionName("FS", enableExports),
 		DirFunctionName:          templateFunctionName("Dir", enableExports),
 		FSByteFunctionName:       templateFunctionName("FSByte", enableExports),
@@ -264,7 +242,7 @@ type _escFile struct {
 	name string
 }
 
-func (_escLocalFS) {{.OpenFunctionName}}(name string) (http.File, error) {
+func (_escLocalFS) Open(name string) (http.File, error) {
 	f, present := _escData[path.Clean(name)]
 	if !present {
 		return nil, os.ErrNotExist
@@ -297,7 +275,7 @@ func (_escStaticFS) prepare(name string) (*_escFile, error) {
 	return f, nil
 }
 
-func (fs _escStaticFS) {{.OpenFunctionName}}(name string) (http.File, error) {
+func (fs _escStaticFS) Open(name string) (http.File, error) {
 	f, err := fs.prepare(name)
 	if err != nil {
 		return nil, err
@@ -305,11 +283,11 @@ func (fs _escStaticFS) {{.OpenFunctionName}}(name string) (http.File, error) {
 	return f.File()
 }
 
-func (dir _escDir) {{.OpenFunctionName}}(name string) (http.File, error) {
+func (dir _escDir) Open(name string) (http.File, error) {
 	return dir.fs.Open(dir.name + name)
 }
 
-func (f *_escFile) {{.FileFunctionName}}() (http.File, error) {
+func (f *_escFile) File() (http.File, error) {
 	type httpFile struct {
 		*bytes.Reader
 		*_escFile
@@ -320,39 +298,39 @@ func (f *_escFile) {{.FileFunctionName}}() (http.File, error) {
 	}, nil
 }
 
-func (f *_escFile) {{.CloseFunctionName}}() error {
+func (f *_escFile) Close() error {
 	return nil
 }
 
-func (f *_escFile) {{.ReaddirFunctionName}}(count int) ([]os.FileInfo, error) {
+func (f *_escFile) Readdir(count int) ([]os.FileInfo, error) {
 	return nil, nil
 }
 
-func (f *_escFile) {{.StatFunctionName}}() (os.FileInfo, error) {
+func (f *_escFile) Stat() (os.FileInfo, error) {
 	return f, nil
 }
 
-func (f *_escFile) {{.NameFunctionName}}() string {
+func (f *_escFile) Name() string {
 	return f.name
 }
 
-func (f *_escFile) {{.SizeFunctionName}}() int64 {
+func (f *_escFile) Size() int64 {
 	return f.size
 }
 
-func (f *_escFile) {{.ModeFunctionName}}() os.FileMode {
+func (f *_escFile) Mode() os.FileMode {
 	return 0
 }
 
-func (f *_escFile) {{.ModTimeFunctionName}}() time.Time {
+func (f *_escFile) ModTime() time.Time {
 	return time.Unix(f.modtime, 0)
 }
 
-func (f *_escFile) {{.IsDirFunctionName}}() bool {
+func (f *_escFile) IsDir() bool {
 	return f.isDir
 }
 
-func (f *_escFile) {{.SysFunctionName}}() interface{} {
+func (f *_escFile) Sys() interface{} {
 	return f
 }
 
@@ -378,7 +356,7 @@ func {{.DirFunctionName}}(useLocal bool, name string) http.FileSystem {
 // true, the filesystem's contents are instead used.
 func {{.FSByteFunctionName}}(useLocal bool, name string) ([]byte, error) {
 	if useLocal {
-		f, err := _escLocal.{{.OpenFunctionName}}(name)
+		f, err := _escLocal.Open(name)
 		if err != nil {
 			return nil, err
 		}
