@@ -27,7 +27,7 @@ The flags are:
 -modtime=""
 	Unix timestamp to override as modification time for all files
 -private
-	Use non-exported function names. Standard FS* functions will be prefixed with esc.  Eg: FSString => escFSString.
+	unexport functions by prefixing them with esc, e.g. FS -> escFS
 ```
 
 ## Accessing Embedded Files
