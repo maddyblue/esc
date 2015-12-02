@@ -29,14 +29,8 @@ var (
 )
 
 type headerTemplateParams struct {
-	PackageName              string
-	FunctionPrefix           string
-	FSFunctionName           string
-	DirFunctionName          string
-	FSByteFunctionName       string
-	FSMustByteFunctionName   string
-	FSStringFunctionName     string
-	FSMustStringFunctionName string
+	PackageName    string
+	FunctionPrefix string
 }
 
 type _escFile struct {
@@ -179,14 +173,8 @@ func header(packageName string, enableExports bool) (string, error) {
 		functionPrefix = "esc"
 	}
 	headerParams := headerTemplateParams{
-		PackageName:              packageName,
-		FunctionPrefix:           functionPrefix,
-		FSFunctionName:           "FS",
-		DirFunctionName:          "Dir",
-		FSByteFunctionName:       "FSByte",
-		FSMustByteFunctionName:   "FSMustByte",
-		FSStringFunctionName:     "FSString",
-		FSMustStringFunctionName: "FSMustString",
+		PackageName:    packageName,
+		FunctionPrefix: functionPrefix,
 	}
 	tmpl, err := template.New("description").Parse(headerTemplate)
 	if nil != err {
@@ -332,27 +320,27 @@ func (f *_escFile) Sys() interface{} {
 	return f
 }
 
-// {{.FunctionPrefix}}{{.FSFunctionName}} returns a http.Filesystem for the embedded assets. If useLocal is true,
+// {{.FunctionPrefix}}FS returns a http.Filesystem for the embedded assets. If useLocal is true,
 // the filesystem's contents are instead used.
-func {{.FunctionPrefix}}{{.FSFunctionName}}(useLocal bool) http.FileSystem {
+func {{.FunctionPrefix}}FS(useLocal bool) http.FileSystem {
 	if useLocal {
 		return _escLocal
 	}
 	return _escStatic
 }
 
-// {{.FunctionPrefix}}{{.DirFunctionName}} returns a http.Filesystem for the embedded assets on a given prefix dir.
+// {{.FunctionPrefix}}Dir returns a http.Filesystem for the embedded assets on a given prefix dir.
 // If useLocal is true, the filesystem's contents are instead used.
-func {{.FunctionPrefix}}{{.DirFunctionName}}(useLocal bool, name string) http.FileSystem {
+func {{.FunctionPrefix}}Dir(useLocal bool, name string) http.FileSystem {
 	if useLocal {
 		return _escDir{fs: _escLocal, name: name}
 	}
 	return _escDir{fs: _escStatic, name: name}
 }
 
-// {{.FunctionPrefix}}{{.FSByteFunctionName}} returns the named file from the embedded assets. If useLocal is
+// {{.FunctionPrefix}}FSByte returns the named file from the embedded assets. If useLocal is
 // true, the filesystem's contents are instead used.
-func {{.FunctionPrefix}}{{.FSByteFunctionName}}(useLocal bool, name string) ([]byte, error) {
+func {{.FunctionPrefix}}FSByte(useLocal bool, name string) ([]byte, error) {
 	if useLocal {
 		f, err := _escLocal.Open(name)
 		if err != nil {
@@ -367,24 +355,24 @@ func {{.FunctionPrefix}}{{.FSByteFunctionName}}(useLocal bool, name string) ([]b
 	return f.data, nil
 }
 
-// {{.FunctionPrefix}}{{.FSMustByteFunctionName}} is the same as {{.FunctionPrefix}}{{.FSByteFunctionName}}, but panics if name is not present.
-func {{.FunctionPrefix}}{{.FSMustByteFunctionName}}(useLocal bool, name string) []byte {
-	b, err := {{.FunctionPrefix}}{{.FSByteFunctionName}}(useLocal, name)
+// {{.FunctionPrefix}}FSMustByte is the same as {{.FunctionPrefix}}FSByte, but panics if name is not present.
+func {{.FunctionPrefix}}FSMustByte(useLocal bool, name string) []byte {
+	b, err := {{.FunctionPrefix}}FSByte(useLocal, name)
 	if err != nil {
 		panic(err)
 	}
 	return b
 }
 
-// {{.FunctionPrefix}}{{.FSStringFunctionName}} is the string version of {{.FunctionPrefix}}{{.FSByteFunctionName}}.
-func {{.FunctionPrefix}}{{.FSStringFunctionName}}(useLocal bool, name string) (string, error) {
-	b, err := {{.FunctionPrefix}}{{.FSByteFunctionName}}(useLocal, name)
+// {{.FunctionPrefix}}FSString is the string version of {{.FunctionPrefix}}FSByte.
+func {{.FunctionPrefix}}FSString(useLocal bool, name string) (string, error) {
+	b, err := {{.FunctionPrefix}}FSByte(useLocal, name)
 	return string(b), err
 }
 
-// {{.FunctionPrefix}}{{.FSMustStringFunctionName}} is the string version of {{.FunctionPrefix}}{{.FSMustByteFunctionName}}.
-func {{.FunctionPrefix}}{{.FSMustStringFunctionName}}(useLocal bool, name string) string {
-	return string({{.FunctionPrefix}}{{.FSMustByteFunctionName}}(useLocal, name))
+// {{.FunctionPrefix}}FSMustString is the string version of {{.FunctionPrefix}}FSMustByte.
+func {{.FunctionPrefix}}FSMustString(useLocal bool, name string) string {
+	return string({{.FunctionPrefix}}FSMustByte(useLocal, name))
 }
 
 var _escData = map[string]*_escFile{
