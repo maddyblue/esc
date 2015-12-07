@@ -172,7 +172,7 @@ func segment(s *bytes.Buffer) string {
 func header(packageName string, enableExports bool) ([]byte, error) {
 	functionPrefix := ""
 	if !enableExports {
-		functionPrefix = "_esc"
+		functionPrefix = "esc"
 	}
 	headerParams := headerTemplateParams{
 		PackageName:    packageName,
