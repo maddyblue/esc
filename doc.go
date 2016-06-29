@@ -19,6 +19,8 @@ The flags are:
 		strip given prefix from filenames
 	-ignore=""
 		regular expression for files to ignore
+	-include=""
+		regular expression for files to include
 	-modtime=""
 		Unix timestamp to override as modification time for all files
 
