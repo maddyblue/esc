@@ -166,6 +166,11 @@ func Run(conf *Config) {
 		if len(local) == 0 {
 			local = "."
 		}
+		if local[0] == '/' {
+			// Read dirs relative to the go proc's cwd vs system's
+			// fs root.
+			local = local[1:]
+		}
 		fmt.Fprintf(w, `
 	%q: {
 		isDir: true,
