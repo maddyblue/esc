@@ -52,7 +52,6 @@ type _escFile struct {
 	fileinfo os.FileInfo
 }
 
-
 func Run(conf *Config) {
 	var err error
 	if conf.ModTime != "" {
@@ -173,12 +172,12 @@ func Run(conf *Config) {
 			local = local[1:]
 		}
 
-		var children="[]string{"
+		var children = "[]string{"
 		childrenFileInfos, _ := ioutil.ReadDir(local)
-		for _,filename := range childrenFileInfos {
-			children+="\""+filename.Name()+"\", "
+		for _, filename := range childrenFileInfos {
+			children += "\"" + filename.Name() + "\", "
 		}
-		children+="}"
+		children += "}"
 
 		fmt.Fprintf(w, `
 	%q: {
