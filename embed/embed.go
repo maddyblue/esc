@@ -52,6 +52,7 @@ type _escFile struct {
 	fileinfo os.FileInfo
 }
 
+
 func Run(conf *Config) {
 	var err error
 	if conf.ModTime != "" {
@@ -171,11 +172,20 @@ func Run(conf *Config) {
 			// fs root.
 			local = local[1:]
 		}
+
+		var children="[]string{"
+		childrenFileInfos, _ := ioutil.ReadDir(local)
+		for _,filename := range childrenFileInfos {
+			children+="\""+filename.Name()+"\", "
+		}
+		children+="}"
+
 		fmt.Fprintf(w, `
 	%q: {
 		isDir: true,
-		local: %q,
-	},%s`, dir, local, "\n")
+		local: %q, 
+		childs: %v,
+	},%s`, dir, local, children, "\n")
 	}
 	fmt.Fprint(w, footer)
 }
@@ -248,6 +258,7 @@ type _escFile struct {
 	modtime    int64
 	local      string
 	isDir      bool
+	childs	   []string
 
 	once sync.Once
 	data []byte
@@ -315,7 +326,15 @@ func (f *_escFile) Close() error {
 }
 
 func (f *_escFile) Readdir(count int) ([]os.FileInfo, error) {
-	return nil, nil
+	var files []os.FileInfo
+	if f.isDir{
+		for _,filename := range f.childs {
+			fileHandle, _ := FS(false).Open("/"+f.local+"/"+filename)
+			stat, _ := fileHandle.Stat()
+			files = append (files, stat)
+		}
+	}
+	return files, nil
 }
 
 func (f *_escFile) Stat() (os.FileInfo, error) {
