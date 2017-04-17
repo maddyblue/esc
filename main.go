@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/danielskowronski/esc/embed"
+	"github.com/mjibson/esc/embed"
 )
 
 func main() {
