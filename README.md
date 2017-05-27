@@ -30,6 +30,8 @@ The flags are:
 	Unix timestamp to override as modification time for all files
 -private
 	unexport functions by prefixing them with esc, e.g. FS -> escFS
+-split
+	write a seperate file for each input file, requires -o
 ```
 
 ## Accessing Embedded Files
