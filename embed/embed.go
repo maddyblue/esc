@@ -350,7 +350,7 @@ func (f *_escFile) Sys() interface{} {
 
 // {{.FunctionPrefix}}FS returns a http.Filesystem for the embedded assets. If useLocal is true,
 // the filesystem's contents are instead used.
-func {{.FunctionPrefix}}FS(useLocal bool) http.FileSystem {
+func {{.FunctionPrefix}}FS(useLocal bool) http.FileSystem { // nolint: deadcode
 	if useLocal {
 		return _escLocal
 	}
@@ -359,7 +359,7 @@ func {{.FunctionPrefix}}FS(useLocal bool) http.FileSystem {
 
 // {{.FunctionPrefix}}Dir returns a http.Filesystem for the embedded assets on a given prefix dir.
 // If useLocal is true, the filesystem's contents are instead used.
-func {{.FunctionPrefix}}Dir(useLocal bool, name string) http.FileSystem {
+func {{.FunctionPrefix}}Dir(useLocal bool, name string) http.FileSystem { // nolint: deadcode
 	if useLocal {
 		return _escDirectory{fs: _escLocal, name: name}
 	}
@@ -398,13 +398,13 @@ func {{.FunctionPrefix}}FSMustByte(useLocal bool, name string) []byte {
 }
 
 // {{.FunctionPrefix}}FSString is the string version of {{.FunctionPrefix}}FSByte.
-func {{.FunctionPrefix}}FSString(useLocal bool, name string) (string, error) {
+func {{.FunctionPrefix}}FSString(useLocal bool, name string) (string, error) { // nolint: deadcode
 	b, err := {{.FunctionPrefix}}FSByte(useLocal, name)
 	return string(b), err
 }
 
 // {{.FunctionPrefix}}FSMustString is the string version of {{.FunctionPrefix}}FSMustByte.
-func {{.FunctionPrefix}}FSMustString(useLocal bool, name string) string {
+func {{.FunctionPrefix}}FSMustString(useLocal bool, name string) string { // nolint: deadcode
 	return string({{.FunctionPrefix}}FSMustByte(useLocal, name))
 }
 
