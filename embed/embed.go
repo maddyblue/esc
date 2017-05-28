@@ -375,10 +375,7 @@ func {{.FunctionPrefix}}FSByte(useLocal bool, name string) ([]byte, error) {
 			return nil, err
 		}
 		b, err := ioutil.ReadAll(f)
-		cErr := f.Close()
-		if cErr != nil {
-			return nil, cErr
-		}
+		_ = f.Close()
 		return b, err
 	}
 	f, err := _escStatic.prepare(name)
