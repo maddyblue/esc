@@ -23,6 +23,8 @@ The flags are:
 		regular expression for files to include
 	-modtime=""
 		Unix timestamp to override as modification time for all files
+	-modtimeUTC
+		Convert file modification times to UTC. Overriden by -modtime option
 
 Accessing Embedded Files
 
