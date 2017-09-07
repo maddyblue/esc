@@ -115,6 +115,9 @@ func Run(conf *Config) {
 				fpath := filepath.ToSlash(fname)
 				n := strings.TrimPrefix(fpath, prefix)
 				n = path.Join("/", n)
+				if _, ok := content[n]; ok {
+					log.Fatalf("%s, %s: duplicate name after prefix removal", n, fpath)
+				}
 				content[n] = _escFile{data: b, local: fpath, fileinfo: fi}
 				fnames = append(fnames, n)
 			}
