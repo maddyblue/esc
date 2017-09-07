@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 
 	"github.com/mjibson/esc/embed"
 )
@@ -20,5 +21,7 @@ func main() {
 	flag.Parse()
 	conf.Files = flag.Args()
 
-	embed.Run(conf)
+	if err := embed.Run(conf); err != nil {
+		log.Fatal(err)
+	}
 }
