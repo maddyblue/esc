@@ -249,6 +249,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"sync"
 	"time"
 )
@@ -291,9 +292,14 @@ func (_escStaticFS) prepare(name string) (*_escFile, error) {
 	if !present {
 		return nil, os.ErrNotExist
 	}
+	err := f.prepare()
+	return f, err
+}
+
+func (f *_escFile) prepare() error {
 	var err error
 	f.once.Do(func() {
-		f.name = path.Base(name)
+		f.name = path.Base(f.local)
 		if f.size == 0 {
 			return
 		}
@@ -306,9 +312,9 @@ func (_escStaticFS) prepare(name string) (*_escFile, error) {
 		f.data, err = ioutil.ReadAll(gr)
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return f, nil
+	return nil
 }
 
 func (fs _escStaticFS) Open(name string) (http.File, error) {
@@ -339,7 +345,23 @@ func (f *_escFile) Close() error {
 }
 
 func (f *_escFile) Readdir(count int) ([]os.FileInfo, error) {
-	return nil, nil
+	if !f.isDir  {
+		return nil, nil
+	}
+	if err := f.prepare(); err != nil {
+		return nil, err
+	}
+	prefix := "/" + f.local +"/"
+	fis := make([]os.FileInfo, 0, len(_escData))
+	for k, v := range _escData {
+		if strings.HasPrefix(k, prefix) {
+			if err := v.prepare(); err != nil {
+				return fis, err
+			}
+			fis = append(fis, v)
+		}
+	}
+	return fis, nil
 }
 
 func (f *_escFile) Stat() (os.FileInfo, error) {
