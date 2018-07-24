@@ -86,3 +86,7 @@ func main() {
 2. Start the server:
 	`go run main.go static.go`
 3. Access http://localhost:8080/static/index.html to view the files.
+
+You can see worked example in [example](example) dir
+just run it as
+`go run example/main.go example/static.go`
