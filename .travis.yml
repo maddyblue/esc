@@ -6,10 +6,13 @@ matrix:
 
 install:
   - go get github.com/golang/lint/golint
+  - go get ./...
   - go install .
 
 script:
-  - esc -o static.go main.go
+  - go generate ./...
+  - esc -o static.go testdata
+  - go test -v ./...
   - go vet ./...
   - LINT=$(golint ./...) && echo $LINT
   - test -z "$LINT"
