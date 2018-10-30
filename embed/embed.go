@@ -147,6 +147,7 @@ func Run(conf *Config, out io.Writer) error {
 						dir.ChildFileNames = append(dir.ChildFileNames, canonicFileName(filepath.Join(fname, fi.Name()), prefix))
 					}
 				}
+				sort.Strings(dir.ChildFileNames)
 				directories = append(directories, dir)
 			} else if includeRegexp == nil || includeRegexp.MatchString(fname) {
 				b, err := ioutil.ReadAll(f)

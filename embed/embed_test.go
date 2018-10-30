@@ -67,6 +67,24 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func TestDirOrder(t *testing.T) {
+	var buf bytes.Buffer
+	config := &Config{
+		Package: "main",
+		Files:   []string{"../testdata/empty"},
+		ModTime: "0",
+	}
+	if err := Run(config, &buf); err != nil {
+		t.Fatal(err)
+	}
+	got := buf.String()
+	expect, _ := ioutil.ReadFile("../testdata/empty.expect")
+
+	if got != string(expect) {
+		t.Fatalf("got %s\nexpected %s", got, expect)
+	}
+}
+
 func Test_escFile_fillCompressed(t *testing.T) {
 	tests := []struct {
 		name           string
