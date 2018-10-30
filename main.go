@@ -4,12 +4,15 @@ import (
 	"flag"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/mjibson/esc/embed"
 )
 
 func main() {
-	conf := &embed.Config{}
+	conf := &embed.Config{
+		Invocation: strings.Join(os.Args[1:], " "),
+	}
 
 	flag.StringVar(&conf.OutputFile, "o", "", "Output file, else stdout.")
 	flag.StringVar(&conf.Package, "pkg", "main", "Package.")
