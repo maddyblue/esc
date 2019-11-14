@@ -18,7 +18,7 @@ jobs:
 
     - name: Get dependencies
       run: |
-        go get -v golang.org/x/lint/golint
+        go get -v -o ./golint golang.org/x/lint/golint
         go get -v -t ./...
 
     - name: Build
@@ -27,7 +27,7 @@ jobs:
         go generate ./...
         ./esc -o static.go testdata
         go test -v ./...
-        LINT=$(golint ./...) && echo $LINT
+        LINT=$(./golint ./...) && echo $LINT
         test -z "$LINT"
         GOFMT=$(gofmt -s -d .) && echo $GOFMT
         test -z "$GOFMT"
