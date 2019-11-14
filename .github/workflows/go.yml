@@ -1,0 +1,33 @@
+name: Go
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go_version: ['1.12', '1.13']
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go_version }}
+      id: go
+
+    - name: Check out code
+      uses: actions/checkout@v1
+
+    - name: Get dependencies
+      run: |
+        go get -v golang.org/x/lint/golint
+        go get -v -t ./...
+
+    - name: Build
+      run: |
+        go build -v .
+        go generate ./...
+        ./esc -o static.go testdata
+        go test -v ./...
+        LINT=$(golint ./...) && echo $LINT
+        test -z "$LINT"
+        GOFMT=$(gofmt -s -d .) && echo $GOFMT
+        test -z "$GOFMT"
