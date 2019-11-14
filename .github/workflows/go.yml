@@ -18,7 +18,7 @@ jobs:
 
     - name: Get dependencies
       run: |
-        go get -v ./golint golang.org/x/lint/golint
+        go get -v golang.org/x/lint/golint
         go get -v -t ./...
 
     - name: Build
