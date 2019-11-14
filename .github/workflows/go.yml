@@ -18,12 +18,13 @@ jobs:
 
     - name: Get dependencies
       run: |
-        go get -v -o ./golint golang.org/x/lint/golint
+        go get -v ./golint golang.org/x/lint/golint
         go get -v -t ./...
 
     - name: Build
       run: |
         go build -v .
+        go build -v golang.org/x/lint/golint
         go generate ./...
         ./esc -o static.go testdata
         go test -v ./...
