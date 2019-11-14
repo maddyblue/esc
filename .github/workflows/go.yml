@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: |
         go build -v .
-        go build -v golang.org/x/lint/golint
+        go build -v -o ./golint golang.org/x/lint/golint
         go generate ./...
         ./esc -o static.go testdata
         go test -v ./...
