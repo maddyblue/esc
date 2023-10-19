@@ -1,3 +1,7 @@
+## DEPRECATED
+
+Stop using this and switch to [embed](https://pkg.go.dev/embed) now in the standard library.
+
 # esc
 
 [![GoDoc](https://godoc.org/github.com/mjibson/esc?status.svg)](https://godoc.org/github.com/mjibson/esc)
