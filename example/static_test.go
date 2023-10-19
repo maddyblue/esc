@@ -3,9 +3,10 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"sort"
 	"strings"
@@ -118,12 +119,16 @@ func testFSOpen(useLocal bool, t *testing.T) {
 				// because all check after only for case when fs.Open return non-err
 				return
 			}
-			raw, err := ioutil.ReadAll(got)
+			raw, err := io.ReadAll(got)
 			if err != nil {
 				t.Errorf("%q. _escLocalFS.Read should not return error. got error = %v,", tt.name, err)
 				return
 			}
-			originalFileRaw, err := ioutil.ReadFile("../testdata" + tt.name)
+			originalFileRaw, err := os.ReadFile("../testdata" + tt.name)
+			if err != nil {
+				t.Errorf("%q. os.ReadFile should not return error. got error = %v,", tt.name, err)
+				return
+			}
 
 			if !bytes.Equal(originalFileRaw, raw) {
 				t.Errorf("%q. _escLocalFS.Open() = %s, want %s", tt.name, raw, originalFileRaw)
@@ -209,7 +214,11 @@ func testFSMustString(useLocal bool, t *testing.T) {
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%s:uselocal=%t", tt.name, useLocal), func(t *testing.T) {
 
-			raw, _ := ioutil.ReadFile("../testdata" + tt.name)
+			raw, err := os.ReadFile("../testdata" + tt.name)
+			if err != nil {
+				t.Errorf("%q. os.ReadFile should not return error. got error = %v,", tt.name, err)
+				return
+			}
 			got := FSMustString(useLocal, tt.name)
 			if strings.Compare(got, string(raw)) != 0 {
 				t.Errorf("%q. FSMustString() = %s, want %s", tt.name, got, raw)
